@@ -7,21 +7,7 @@ import AntDesign from "react-native-vector-icons/AntDesign"
 const LikeScreen = () => {
 
   const data = [
-    {
-      id: 1 ,
-      imageUrl :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s",
-      prompt : "Generate an AI image"
-    },
-    {
-      id: 2 ,
-      imageUrl :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s",
-      prompt : "Generate an AI image"
-    },
-    {
-      id: 3 ,
-      imageUrl :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s",
-      prompt : "Generate an AI image"
-    },
+    
   ]
 
   

@@ -1,14 +1,15 @@
-import { Linking, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Linking, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import { colors, fontFamily, fontSize } from '../theme'
 import Icon from "react-native-vector-icons/MaterialIcons"
 import { ActivityIndicator } from 'react-native'
 import ImageCard from '../components/ImageCard'
+import { api } from '../utils/api'
 
 const HomeScreen = () => {
   const [prompt , setPrompt] = useState("")
   const [isLoading , setIsLoading] = useState(false)
-  const [image , setImage] = useState("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s")
+  const [image , setImage] = useState("")
 
   // https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s
 
@@ -20,12 +21,40 @@ const HomeScreen = () => {
     })
   }
 
+  const handleGenerateImage = async()=>{
+    try {
+      if(!prompt.length){
+        ToastAndroid.show("Please enter the prompt to generate the image", ToastAndroid.SHORT);
+        return ;
+      }
+      setIsLoading(true);
+      const response = await api.post("/generate-image",{
+        prompt : prompt
+      });
+      console.log("response => " , response.data)
+      setImage(response.data.imageUrl)
+      setIsLoading(false)
+      ToastAndroid.show("Image generated succesfully!", ToastAndroid.SHORT)
+    } catch (error) {
+      ToastAndroid.show("Something went wrong !", ToastAndroid.SHORT)
+      setIsLoading(false)
+    }finally{
+      
+      setIsLoading(false)
+
+    }
+  }
+
+  const handleClearPrompt = ()=>{
+    setPrompt("")
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container} >
 
       {/* Logo container  */}
       <View style={styles.appLogoContainer} >
-        <Text style={styles.appName} >Kalpana AI</Text>
+        <Text style={styles.appName} >Kalpana Chitra</Text>
         <TouchableOpacity onPress={handleOpenLink} >
           <Text style={styles.madeBy} >Made by {" "}
             <Text style={[styles.madeBy,
@@ -44,7 +73,7 @@ const HomeScreen = () => {
 
             {
               prompt?(
-                <TouchableOpacity style={styles.clearButton} >
+                <TouchableOpacity style={styles.clearButton} onPress={handleClearPrompt} >
                   <Icon name={"close"} size={24} color={"#fff"} />
                 </TouchableOpacity>
               ) : null
@@ -54,10 +83,10 @@ const HomeScreen = () => {
       </View>
 
       {/* Generate Button  */}
-      <TouchableOpacity style={styles.generateButton} >
+      <TouchableOpacity style={styles.generateButton} onPress={handleGenerateImage} >
 
             {
-              isLoading ? (<ActivityIndicator size={'small'} color={"#fff"} />) : 
+              isLoading ? (<ActivityIndicator size={'small'} color={"#fff"}  />) : 
               <Text style={styles.generateBtnText} >
           Generate
               </Text>
