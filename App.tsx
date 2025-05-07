@@ -8,11 +8,13 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import LikeScreen from './src/screens/LikeScreen';
 import DiscoverScreen from './src/screens/DiscoverScreen';
 import { colors } from './src/theme';
+import { LikeImagesProvider } from './src/context/LikeImageContext';
 
 const Tab = createBottomTabNavigator();
 
 const App = () => {
   return (
+    <LikeImagesProvider>
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
@@ -62,6 +64,7 @@ const App = () => {
         />
       </Tab.Navigator>
     </NavigationContainer>
+    </LikeImagesProvider>
   );
 };
 

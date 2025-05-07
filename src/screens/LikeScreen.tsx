@@ -1,14 +1,15 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useContext } from 'react'
 import { fontFamily } from '../theme'
 import ImageCard from '../components/ImageCard'
 import AntDesign from "react-native-vector-icons/AntDesign"
+import { LikeImagesContext } from '../context/LikeImageContext'
 
 const LikeScreen = () => {
 
-  const data = [
-    
-  ]
+  const {likedImages} = useContext(LikeImagesContext)
+
+  
 
   
   
@@ -18,7 +19,7 @@ const LikeScreen = () => {
     <View style={styles.container}  >
       <Text style={styles.title} >Liked Images</Text>
 
-      <FlatList data={data}  
+      <FlatList data={likedImages}  
         renderItem={({item , index})=>{
           return(
             <ImageCard item={item} />
@@ -28,7 +29,7 @@ const LikeScreen = () => {
         contentContainerStyle={
           [
               styles.listContainer,
-              data.length===0 && styles.emptyListContainer
+              likedImages.length===0 && styles.emptyListContainer
           ]
         }
 

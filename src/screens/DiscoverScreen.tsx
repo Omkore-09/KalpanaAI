@@ -1,51 +1,92 @@
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, ToastAndroid, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { fontFamily } from '../theme'
 import ImageCard from '../components/ImageCard'
+import { api } from '../utils/api'
 
 const DiscoverScreen = () => {
+  const [page , setPage] = useState<number>(1)
+  const [images , setImages] = useState([]);
   const [refreshing , setRefreshing ] = useState (false)
+  const [loading , setLoading]= useState(false)
+  const [hasNextPage , setHasNextPage] = useState(true)
 
-  const data = [
-    {
-      id: 1 ,
-      imageUrl :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s",
-      prompt : "Generate an AI image"
-    },
-    {
-      id: 2 ,
-      imageUrl :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s",
-      prompt : "Generate an AI image"
-    },
-    {
-      id: 3 ,
-      imageUrl :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s",
-      prompt : "Generate an AI image"
-    },
-  ]
+  useEffect(()=>{
+    handleFetchImage()
+  }, [page])
+
+  // const data = [
+  //   {
+  //     id: 1 ,
+  //     imageUrl :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s",
+  //     prompt : "Generate an AI image"
+  //   },
+  //   {
+  //     id: 2 ,
+  //     imageUrl :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s",
+  //     prompt : "Generate an AI image"
+  //   },
+  //   {
+  //     id: 3 ,
+  //     imageUrl :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtJLg26Psc-i7q9ict7xIBuvdHNCBARduzFQ&s",
+  //     prompt : "Generate an AI image"
+  //   },
+  // ]
+
+  const handleFetchImage = async () =>{
+    try {
+      setLoading(true)
+      const response = await api.get("/discover-image", {
+        params :{
+          page,
+        }
+      });
+      if(page==1){
+        setImages(response.data.images)
+      }else{
+        setImages((prevImages)=>[...prevImages,...response.data.images]);
+      }
+      let isNextPage = response.data.totalPages > response.data.currentPage? true: false
+      setHasNextPage(isNextPage)
+      setLoading(false)
+    } catch (error) {
+      ToastAndroid.show("Something went wrong", ToastAndroid.SHORT)
+      setLoading(false)
+    }
+  }
+
+  const handleLoadMoreImages = ()=>{
+    if(hasNextPage){
+      setPage(page+1)
+    }
+  }
 
   const onRefresh = () =>{
     setRefreshing(true);
-    //api call
+    setPage(1)
     setRefreshing(false)
   }
 
   return (
     <View style={styles.conatainer} >
       <Text style={styles.title} >Discover</Text>
-      <FlatList data={data} 
+      <FlatList data={images} 
       
       renderItem={({item , index})=>{
         return(
           <ImageCard item={item}/>
         )
       }}
-      keyExtractor={(item)=>item.id}
+      keyExtractor={(item)=>item._id}
       showsVerticalScrollIndicator ={false}
       contentContainerStyle= {styles.listContainer}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={"#3B82F6"} />
       }
+      ListFooterComponent={
+        loading ? <ActivityIndicator size={"large"} color={"#3BB2F6"} /> : null
+      }
+      onEndReached={handleLoadMoreImages}
       />
     </View>
   )
@@ -59,7 +100,7 @@ const styles = StyleSheet.create({
       backgroundColor : "#1E1E1E",
       paddingHorizontal : 20
   },
-  title :{
+  title :{ 
     color : "#fff",
     fontSize : 30,
     fontFamily : fontFamily.bold,
